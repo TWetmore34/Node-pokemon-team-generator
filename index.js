@@ -1,3 +1,4 @@
+const buttonEl = document.getElementById('btn')
 const pokemon = require('pokemon');
 const fetch = require('node-fetch');
 
@@ -38,5 +39,6 @@ function chooseItem(){
 })
 }
 chooseItem()
-teamMoves(makeATeam())
+
 // ok so the overall plan is to eventually set up random teams for different formats
+buttonEl.addEventListener('click', teamMoves(makeATeam()))
