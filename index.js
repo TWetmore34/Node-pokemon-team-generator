@@ -1,44 +1,51 @@
-const buttonEl = document.getElementById('btn')
-const pokemon = require('pokemon');
 const fetch = require('node-fetch');
+const fs = require('fs');
 
-function makeATeam(){
-    newTeam = []
-    for(i=0;i<6;i++){
-        newTeam.push(pokemon.all()[Math.floor(Math.random()*809)])
+async function teamMoves(){
+    let items = await fs.readFileSync("itemList.json", "utf-8");
+    items = JSON.parse(items);
+    let team = []
+    for(let i=0;i<6;i++){
+        let url = 'https://pokeapi.co/api/v2/pokemon/' + Math.floor(Math.random() * 905);
+        let unparsed = await fetch(url);
+        let data = await unparsed.json()
+        let moves = []
+        for(j=0;j<4;j++){
+            moves.push(data.moves[Math.floor(Math.random()*data.moves.length)].move.name)
+        }
+        let teamSet = {
+            name: data.name,
+            ability: data.abilities[Math.floor(Math.random()*data.abilities.length)].ability.name,
+            moves: moves,
+            item: items[Math.floor(Math.random() * items.length)]
+        }
+        team.push(teamSet);
     }
-    return newTeam
-};
-
-function teamMoves(team){
-    for(let i=0;i<team.length;i++){
-        url = 'https://pokeapi.co/api/v2/pokemon/' + team[i].toLowerCase();
-        fetch(url).then(response => response.json())
-        .then(data => {
-            let moves = []
-            for(j=0;j<4;j++){
-                moves.push(data.moves[Math.floor(Math.random()*data.moves.length)].move.name)
-            }
-            let teamSet = {
-                name: data.name,
-                ability: data.abilities[Math.floor(Math.random()*data.abilities.length)].ability.name,
-                moves: moves,
-                item: ''
-            }
-            return teamSet;
-        })
-    }
+    return team
     
 }
+// let resp = true
+// let notStr = []
 
-function chooseItem(){
-        url = `https://pokeapi.co/api/v2/item/10`;
-        fetch(url).then(response => response.json())
-        .then(data => {
-            console.log(data)
-})
+// async function chooseItem(num){
+//         let url = `https://pokeapi.co/api/v2/item/${num}`;
+//         try {
+//             let data = await fetch(url)
+//             let readable = await data.json()
+//             notStr.push(readable.name)
+//             fs.writeFileSync("itemList.json", JSON.stringify(notStr), (err) => {
+//                 if (err) throw err
+//             })
+//         }
+//         catch(err) {
+//             resp = false
+//             if (err) throw err
+//         }
+// }
+
+const makeATeam = async () => {
+    let team  = await teamMoves();
+    console.log(team)
 }
-chooseItem()
 
-// ok so the overall plan is to eventually set up random teams for different formats
-buttonEl.addEventListener('click', teamMoves(makeATeam()))
+makeATeam()
