@@ -1,25 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import PokeCard from './components/PokeCard';
-import TeamSetup from "./utils/TeamFunctions"
+import teamMoves from "./utils/TeamFunctions"
 
 const App = () => {
-    const renderTeam = async () => {
-        let team = new TeamSetup();
-        let fullTeam = await team.teamMoves();
-        return fullTeam
+    const [mons, setMons] = useState([]);
+    const [testing, setTesting] = useState(true);
+
+    async function setTest() {
+      let list = await teamMoves()
+      setMons(list)
+      setTesting(false)
     }
 
-    const [mons, setMons] = useState(renderTeam())
-
-    const handleRender = () => {
-        
-        
-    }
+    useEffect(() => {
+      setTest();
+    },[testing])
 
 
   return (
     <div className='row m-4'>
         {
+          mons.map(mon => {
+            return (
+              <PokeCard key={mon.name} img={mon.img} name={mon.name} ability={mon.ability} moves={mon.moves} item={mon.item.name}  />
+            )
+          })
         }
     </div>
   )
